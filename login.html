@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Acesso Restrito | OCA Engenharia</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="js/auth.js"></script>
+  <style>
+    body {
+      display: flex; align-items: center; justify-content: center;
+      height: 100vh; background: #f4f6f8; font-family: sans-serif;
+    }
+    .login-box {
+      background: white; padding: 40px; border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1); text-align: center;
+    }
+    input {
+      padding: 10px; width: 100%; margin-top: 10px;
+      border-radius: 8px; border: 1px solid #ccc;
+    }
+    button {
+      background: #1f3c88; color: white; border: none;
+      padding: 10px 20px; border-radius: 8px;
+      margin-top: 15px; cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-box">
+    <h2>Acesso Restrito</h2>
+    <p>Digite a senha para acessar o painel da obra</p>
+    <input type="password" id="password" placeholder="Senha">
+    <button onclick="login(document.getElementById('password').value)">Entrar</button>
+  </div>
+</body>
+</html>

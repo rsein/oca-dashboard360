@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dashboard - OCA Engenharia | Acompanhamento de Obra</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --oca-blue:#004AAD;
+      --oca-blue-2:#0a60c8;
+      --bg:#f5f7fa;
+      --card:#ffffff;
+      --muted:#6b7280;
+      --accent:#ffc857;
+      --radius:12px;
+      font-family: 'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:#12263f;}
+
+    /* Header */
+
+    .header{display:flex;align-items:center;justify-content:space-between;padding:18px 28px;background:linear-gradient(90deg,var(--oca-blue),var(--oca-blue-2));color:#fff}
+    .brand{display:flex;align-items:center;gap:14px}
+    .logo{width:56px;height:56px;object-fit: contain;border-radius:8px;background: none}
+    .project-title{font-size:18px;font-weight:600}
+    .header-right{display:flex;align-items:center;gap:12px}
+    .btn-primary{background:#fff;color:var(--oca-blue);padding:10px 16px;border-radius:10px;font-weight:600;border:none;cursor:pointer;box-shadow:0 6px 18px rgba(4,23,66,0.12)}
+    .btn-primary:hover{transform:translateY(-2px)}
+
+    /* Layout */
+    .container{max-width:1200px;margin:28px auto;padding:0 18px}
+    .grid{display:grid;grid-template-columns:1fr 360px;gap:20px}
+
+    /* Left area */
+    .card{background:var(--card);border-radius:var(--radius);padding:18px;box-shadow:0 6px 24px rgba(8,15,30,0.06)}
+    .info-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+    .info-item{background:linear-gradient(180deg,#fff,#fbfbff);padding:12px;border-radius:10px}
+    .info-item h4{margin:0;font-size:12px;color:var(--muted);}
+    .info-item p{margin:6px 0 0;font-weight:600}
+
+    /* Countdown & progress */
+    .count-prog{display:flex;align-items:center;justify-content:space-between;gap:20px}
+    .countdown{background:linear-gradient(90deg,#fff,#f8fbff);padding:14px;border-radius:10px;min-width:220px;text-align:center}
+    .countdown .days{font-size:34px;font-weight:700;color:var(--oca-blue)}
+    .progress-wrap{flex:1}
+    .progress-bar{height:18px;background:#e6eefc;border-radius:9px;overflow:hidden}
+    .progress-bar > i{display:block;height:100%;background:linear-gradient(90deg,var(--oca-blue),var(--oca-blue-2));width:0}
+    .progress-meta{display:flex;justify-content:space-between;font-size:13px;margin-top:8px;color:var(--muted)}
+
+    /* Carousel */
+    .carousel{position:relative;height:1350px;border-radius:10px;overflow:hidden}s
+    .carousel img{width:100%;height:100%;object-fit:cover;display:block}
+    .carousel-controls{position:absolute;left:12px;right:12px;bottom:12px;display:flex;justify-content:space-between}
+    .dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.6);margin:0 4px;display:inline-block}
+    .dot.active{background:var(--oca-blue)}
+
+    /* Status and downloads */
+    .status{margin-top:18px;padding:12px;border-radius:10px;background:linear-gradient(90deg,#fff8e6,#fff)}
+    .status h3{margin:0 0 6px 0}
+    .downloads{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+    .dl-btn{background:var(--oca-blue);color:#fff;padding:10px 12px;border-radius:8px;border:none;font-weight:600;display:inline-flex;align-items:center;gap:8px;cursor:pointer}
+
+    /* Right column */
+    .side{display:flex;flex-direction:column;gap:12px}
+    .side .card{padding:16px}
+    .mini-map{height:300px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#f7fbff,#fff)}
+    .scene-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+    .scene-item{display:flex;gap:10px;align-items:center;padding:8px;border-radius:8px;cursor:pointer}
+    .scene-item:hover{background:#f5f9ff}
+    .thumb{width:64px;height:48px;border-radius:6px;background:#ddd;object-fit:cover}
+
+    footer{margin-top:28px;padding:18px;background:#fff;border-top:1px solid #eff3f8}
+    .footer-inner{max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;padding:0 18px}
+
+    /* Tour view (full screen) */
+    .tour-view{position:fixed;inset:0;background:#000;display:none;flex-direction:column}
+    .tour-header{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:rgba(0,0,0,0.45);color:#fff}
+    .tour-main{flex:1;display:flex}
+    #viewer{flex:1}
+    .tour-sidebar{width:300px;background:#fff;overflow:auto;padding:12px}
+    .back-btn{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.22);color:#fff;padding:8px 12px;border-radius:8px;cursor:pointer}
+
+    /* Responsive */
+    @media(max-width:980px){
+      .grid{grid-template-columns:1fr;}
+      .header{padding:12px}
+      .header-right{display:none}
+      .tour-sidebar{width:240px}
+    }
+
+  </style>
+</head>
+<body>
+  <header class="header">
+  <div class="brand">
+    <img src="images/Logo-OCA-02.png" alt="OCA Engenharia" class="logo">
+    <div class="brand-text">
+      <div class="project-title">Acompanhamento de Obra</div>
+      <div class="subtitle">Painel de acompanhamento - OCA Engenharia</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <button id="openTourBtn" class="btn-primary">Acessar Tour 360°</button>
+  </div>
+</header>
+
+  <main class="container">
+    <div class="grid">
+      <section>
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+            <div style="flex:1">
+              <h2 id="obraNome" style="margin:0">Obra - MedSênior</h2>
+              <p style="margin:6px 0 0;color:var(--muted)">Cliente: <strong id="clienteNome">MedSênior</strong></p>
+            </div>
+            <div style="min-width:260px;text-align:right">
+              <div style="font-size:12px;color:var(--muted)">Data Início <span style="font-weight:600"> <span id="dataInicio">2025-10-01</span></span></div>
+              <div style="font-size:12px;color:var(--muted)">Data Entrega <span style="font-weight:600"> <span id="dataEntrega">2026-01-05</span></span></div>
+            </div>
+          </div>
+
+          <hr style="border:none;height:1px;background:#f1f5fb;margin:14px 0">
+
+          <div class="count-prog">
+            <div class="countdown card">
+              <div style="font-size:12px;color:var(--muted)">Dias restantes</div>
+              <div class="days" id="daysLeft">--</div>
+              <div style="font-size:12px;color:var(--muted)">até a entrega</div>
+            </div>
+
+            <div class="progress-wrap">
+              <div style="font-size:13px;color:var(--muted);margin-bottom:8px">Progresso estimado</div>
+              <div class="progress-bar"><i id="progressFill" style="width:0%"></i></div>
+              <div class="progress-meta"><div id="progressPercent">0%</div><div id="progressDates" style="color:var(--muted)">0 dias desde o início</div></div>
+            </div>
+          </div>
+
+          <div style="height:18px"></div>
+
+          <div class="carousel card" id="carousel">
+            <img id="carouselImg" src="images/carousel1.jpg" alt="obra">
+            <div class="carousel-controls">
+              <div id="dots"></div>
+              <div style="display:flex;gap:8px">
+                <button id="prevC" class="dl-btn" style="background:rgba(255,255,255,0.9);color:var(--oca-blue)">◀</button>
+                <button id="nextC" class="dl-btn" style="background:rgba(255,255,255,0.9);color:var(--oca-blue)">▶</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="status">
+            <h3>Status atual</h3>
+            <p id="statusText">Etapa: Estrutura metálica - Armadura e concretagem do pilar 2</p>
+            <div class="downloads">
+              <a class="dl-btn" href="reports/1 - RDO SEMANAL MEDSÊNIOR PARQUE AMORIM (29-09-2025 A 03-10-2025).pdf" download>Relatório Semana 1</a>
+              <a class="dl-btn" href="reports/2 - RDO SEMANAL MEDSÊNIOR PARQUE AMORIM (06-10-2025 A 10-10-2025).pdf" download>Relatório Semana 2</a>
+              <a class="dl-btn" href="reports/3 - RDO SEMANAL MEDSÊNIOR PARQUE AMORIM (13-10-2025 A 17-10-2025).pdf" download>Relatório Semana 3</a>
+              <a class="dl-btn" href="reports/4 - RDO SEMANAL MEDSÊNIOR PARQUE AMORIM (21-10-2025 A 24-10-2025).pdf" download>Relatório Semana 4</a>
+              <a class="dl-btn" href="reports/relatorio_semana5.pdf" download>Relatório Semana 5</a>
+            </div>
+          </div>
+        </div>
+
+        <footer>
+          <div class="footer-inner">
+            <div>OCA Engenharia • Rua Exemplo, Recife - PE • +55 (81) 99999-9999 • contato@ocaengenharia.com.br</div>
+            <div style="opacity:0.8">© OCA Engenharia</div>
+          </div>
+        </footer>
+      </section>
+
+      <aside class="side">
+        <div class="card">
+          <h4 style="margin:0 0 8px 0;color:var(--muted)">Mapa de pontos</h4>
+          <div class="mini-map">Mini mapa / planta (substituir por imagem)</div>
+          <div class="scene-list" id="sceneList">
+            <!-- scene items injected here -->
+          </div>
+        </div>
+
+        <div class="card">
+          <h4 style="margin:0 0 8px 0;color:var(--muted)">Resumo rápido</h4>
+          <p style="margin:0 0 8px 0">Progresso calculado com base nas datas de início e entrega. Substitua por progresso real se desejar.</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <div style="background:#f5f9ff;padding:8px;border-radius:8px;min-width:120px;text-align:center">Orçamento: <br><strong>R$ 1.200.000</strong></div>
+            <div style="background:#fff8e6;padding:8px;border-radius:8px;min-width:120px;text-align:center">Equipe: <br><strong>32 pessoas</strong></div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <!-- TOUR VIEW -->
+  <div id="tour" class="tour-view">
+    <div class="tour-header">
+      <div style="display:flex;gap:12px;align-items:center">
+        <div class="logo" style="width:40px;height:40px">OCA</div>
+        <div style="font-weight:600">Tour 360° - Obra Exemplo</div>
+      </div>
+      <div>
+        <button id="backToDashboard" class="back-btn">Voltar ao Dashboard</button>
+      </div>
+    </div>
+    <div class="tour-main">
+      <div id="viewer"></div>
+      <aside class="tour-sidebar card">
+        <h4 style="margin:0 0 8px 0">Pontos de visita</h4>
+        <div id="tourScenes" style="display:flex;flex-direction:column;gap:8px"></div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- scripts -->
+  <!-- Marzipano (CDN) -->
+  <script src="https://www.marzipano.net/demos/marzipano.js"></script>
+  <script>
+    /***** CONFIG - alterar conforme a obra real *****/
+    const CONFIG = {
+      obraNome: 'Obra - MedSênior',
+      cliente: 'MedSênior Hospitalar',
+      dataInicio: '2025-10-01',
+      dataEntrega: '2026-01-05',
+      carouselImages: ['images/Semana1-01.jpg','images/Semana1-02.jpg','images/Semana1-03.jpg','images/Semana1-04.jpg','images/Semana1-05.jpg'],
+      scenes: [
+        { id:'entrada', title:'Entrada', thumb:'images/thumb_entrada.jpg', pano:'images/panorama_entrada.jpg' },
+        { id:'pav1', title:'Pavimento 1', thumb:'images/thumb_pav1.jpg', pano:'images/panorama_pav1.jpg' },
+        { id:'cobertura', title:'Cobertura', thumb:'images/thumb_cobertura.jpg', pano:'images/panorama_cobertura.jpg' }
+      ]
+    };
+
+    // inicializa textos
+    document.getElementById('obraNome').textContent = CONFIG.obraNome;
+    document.getElementById('clienteNome').textContent = CONFIG.cliente;
+    document.getElementById('dataInicio').textContent = CONFIG.dataInicio;
+    document.getElementById('dataEntrega').textContent = CONFIG.dataEntrega;
+
+    // contador e progresso
+    function diasEntre(a,b){return Math.ceil((b-a)/(1000*60*60*24));}
+    function atualizaContadores(){
+      const inicio = new Date(CONFIG.dataInicio + 'T00:00:00');
+      const entrega = new Date(CONFIG.dataEntrega + 'T00:00:00');
+      const hoje = new Date();
+      const totalDias = diasEntre(inicio,entrega);
+      const diasPassados = diasEntre(inicio,hoje);
+      const diasRest = Math.max(0, diasEntre(hoje,entrega));
+      const percent = Math.min(100, Math.max(0, Math.round((diasPassados/totalDias)*100)));
+      document.getElementById('daysLeft').textContent = diasRest;
+      document.getElementById('progressFill').style.width = percent + '%';
+      document.getElementById('progressPercent').textContent = percent + '%';
+      document.getElementById('progressDates').textContent = diasPassados + ' dias desde o início';
+    }
+    atualizaContadores();
+    setInterval(atualizaContadores,60*1000);
+
+    // carousel
+    (function(){
+      const imgs = CONFIG.carouselImages;
+      const imgEl = document.getElementById('carouselImg');
+      const dots = document.getElementById('dots');
+      let idx=0; let timer=null;
+      imgs.forEach((s,i)=>{const d=document.createElement('span');d.className='dot'+(i===0?' active':'');d.addEventListener('click',()=>{show(i)});dots.appendChild(d)});
+      function show(i){idx=i;imgEl.src=imgs[i];Array.from(dots.children).forEach((d,ii)=>d.className='dot'+(ii===i?' active':''))}
+      document.getElementById('prevC').addEventListener('click',()=>{show((idx-1+imgs.length)%imgs.length)})
+      document.getElementById('nextC').addEventListener('click',()=>{show((idx+1)%imgs.length)})
+      function autoplay(){timer=setInterval(()=>{show((idx+1)%imgs.length)},4000)}
+      autoplay();
+      document.getElementById('carousel').addEventListener('mouseenter',()=>clearInterval(timer))
+      document.getElementById('carousel').addEventListener('mouseleave',autoplay)
+    })();
+
+    // scene list (right column)
+    const sceneList = document.getElementById('sceneList');
+    CONFIG.scenes.forEach(s=>{
+      const el=document.createElement('div');el.className='scene-item';el.innerHTML=`<img class='thumb' src='${s.thumb}' alt='${s.title}'><div style='flex:1'><strong>${s.title}</strong><div style='font-size:12px;color:var(--muted)'>Clique para abrir no tour</div></div>`;
+      el.addEventListener('click',()=>openTourAndGoTo(s.id));
+      sceneList.appendChild(el);
+    });
+
+    /********* TOUR (Marzipano) *********/
+    let viewer, scenesMap = {}, currentScene=null;
+    function initTour(){
+      const viewerElement = document.getElementById('viewer');
+      try{
+        viewer = new Marzipano.Viewer(viewerElement);
+      }catch(e){
+        viewerElement.innerHTML = '<div style="color:#fff;padding:20px">Erro ao carregar o visualizador 360. Verifique conexão com a biblioteca Marzipano.</div>';
+        return;
+      }
+
+      CONFIG.scenes.forEach(s=>{
+        const source = Marzipano.ImageUrlSource.fromString(s.pano);
+        const geometry = new Marzipano.EquirectGeometry([{ width: 8192 }]);
+        const view = new Marzipano.RectilinearView({yaw: Math.PI});
+        const scene = viewer.createScene({source,geometry,view});
+        scenesMap[s.id]= { scene, data:s };
+      });
+
+      // build sidebar
+      const tourScenes = document.getElementById('tourScenes');
+      CONFIG.scenes.forEach(s=>{
+        const btn=document.createElement('button');btn.className='dl-btn';btn.style.background='#fff';btn.style.color='#12263f';btn.style.border='1px solid #eef4ff';btn.style.justifyContent='flex-start';btn.style.width='100%';btn.style.padding='8px';btn.innerHTML = `<img src='${s.thumb}' style='width:56px;height:40px;object-fit:cover;border-radius:6px;margin-right:8px;vertical-align:middle'> <strong style='vertical-align:middle'>${s.title}</strong>`;
+        btn.addEventListener('click',()=>switchToScene(s.id));
+        tourScenes.appendChild(btn);
+      });
+
+      // default scene
+      if(CONFIG.scenes.length) switchToScene(CONFIG.scenes[0].id);
+    }
+
+    function openTourAndGoTo(sceneId){
+      document.getElementById('tour').style.display='flex';
+      document.body.style.overflow='hidden';
+      if(!viewer) initTour();
+      setTimeout(()=>switchToScene(sceneId),200);
+    }
+
+    function switchToScene(id){
+      const entry = scenesMap[id];
+      if(!entry) return;
+      entry.scene.switchTo();
+      currentScene = id;
+    }
+
+    document.getElementById('openTourBtn').addEventListener('click',()=>openTourAndGoTo(CONFIG.scenes[0].id));
+    document.getElementById('backToDashboard').addEventListener('click',()=>{document.getElementById('tour').style.display='none';document.body.style.overflow='auto'})
+
+    // start with placeholder content
+    window.addEventListener('load',()=>{
+      // if images missing, replace with placeholder
+      document.querySelectorAll('img').forEach(img=>{
+        img.onerror = function(){this.src='https://via.placeholder.com/800x450?text=Substituir+imagem'}
+      });
+    });
+
+  </script>
+
+</body>
+</html>
