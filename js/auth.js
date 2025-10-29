@@ -10,7 +10,7 @@ function isAuthenticated() {
 function login(password) {
   if (password === MASTER_PASSWORD) {
     localStorage.setItem("authenticated", "true");
-    window.location.href = "index.html";
+    window.location.href = "dashboard.html";
   } else {
     alert("Senha incorreta!");
   }
@@ -19,6 +19,7 @@ function login(password) {
 // Protege as páginas
 function protectPage() {
   if (!isAuthenticated()) {
-    window.location.href = "login.html";
+    window.location.href = "index.html";
   }
 }
+
